@@ -116,6 +116,39 @@ function App() {
             <div style={{ textAlign: 'center', marginBottom: '30px' }}>
                 <h1>Piadas do Chuck Norris</h1>
             </div>
+            <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                <p>Clique no botão abaixo para receber uma piada</p>
+                <Button variant="primary" size="sm" onClick={getPiadaAleatoria}>Piada aleatória</Button>
+                <p>{state.piada}</p>
+            </div>
+            <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                <h3>Categorias</h3>
+                <p>Para ver as categorias das piadas, clique no botão abaixo</p>
+                <Button variant="primary" size="sm" onClick={getCategorias}>Categorias</Button>
+                {state.mostrarCategorias && (
+                    <ul>
+                        {state.categorias.map((categoria, index) => (
+                            <li key={index}>{categoria}</li>
+                        ))}
+                    </ul>
+                )}
+            </div>
+            <div style={{ textAlign: 'center', marginTop: '20px' }}>
+                <h3>Busca por palavra-chave</h3>
+                <input
+                    type="text"
+                    value={state.keyword}
+                    onChange={(e) => dispatch({ type: ACTIONS.SET_KEYWORD, payload: e.target.value })}
+                    placeholder="Digite uma palavra-chave" style={{ marginRight: '10px' }}
+                />
+                <Button variant="primary" size="sm" onClick={buscarPorPalavraChave}>Buscar</Button>
+                {/* Renderizando 1 piada por parágrafo */}
+                {state.resultadoBusca && state.resultadoBusca.map((piada, index) => (
+                    <p key={index}>{piada}</p>
+                ))}
+                {state.erro && <p style={{ color: 'red' }}>{state.erro}</p>}
+            </div>
+
         </div>
     );
 }
