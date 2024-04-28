@@ -1,4 +1,4 @@
-// Matheus Peres Medeiros Barreto
+// Matheus Peres Medeiros Barreto - RA: 2410184
 
 import React, { useReducer } from 'react';
 import { Button } from 'react-bootstrap';
@@ -48,9 +48,65 @@ function App() {
     const [state, dispatch] = useReducer(reducer, initialState);
 
 
-    const getPiadaAleatoria = () => {};
-    const getCategorias = () => {};
-    const buscarPorPalavraChave = () => {};
+    const getPiadaAleatoria = () => {
+        fetch('https://api.chucknorris.io/jokes/random')
+            .then(response => response.json())
+            .then(data => {
+                dispatch({ type: ACTIONS.SET_PIADA, payload: data.value });
+                dispatch({ type: ACTIONS.SET_ERRO, payload: '' });
+            })
+            .catch(error => {
+                console.error("Erro ao obter piada: ", error);
+                dispatch({ type: ACTIONS.SET_ERRO, payload: 'Erro ao obter piada. Por favor, tente novamente mais tarde.' });
+            });
+    };
+
+    const getCategorias = () => {
+        if (state.mostrarCategorias) {
+            dispatch({ type: ACTIONS.SET_CATEGORIAS, payload: [] });
+            dispatch({ type: ACTIONS.SET_ERRO, payload: '' });
+            dispatch({ type: ACTIONS.TOGGLE_CATEGORIAS });
+        } else {
+            fetch('https://api.chucknorris.io/jokes/categories')
+                .then(response => response.json())
+                .then(data => {
+                    dispatch({ type: ACTIONS.SET_CATEGORIAS, payload: data });
+                    dispatch({ type: ACTIONS.SET_ERRO, payload: '' });
+                    dispatch({ type: ACTIONS.TOGGLE_CATEGORIAS });
+                })
+                .catch(error => {
+                    console.error("Erro ao obter categorias: ", error);
+                    dispatch({ type: ACTIONS.SET_ERRO, payload: 'Erro ao obter categorias. Por favor, tente novamente mais tarde.' });
+                });
+        }
+    };
+
+    const buscarPorPalavraChave = () => {
+        if (state.keyword === '') {
+            dispatch({ type: ACTIONS.SET_ERRO, payload: 'Por favor, digite uma palavra-chave para buscar.' });
+            dispatch({ type: ACTIONS.SET_RESULTADO_BUSCA, payload: '' });
+            return;
+        }
+    
+        fetch(`https://api.chucknorris.io/jokes/search?query=${state.keyword}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.result.length === 0) {
+                    dispatch({ type: ACTIONS.SET_RESULTADO_BUSCA, payload: 'Nenhuma piada encontrada com essa palavra-chave.' });
+                    dispatch({ type: ACTIONS.SET_ERRO, payload: '' });
+                    return;
+                }
+    
+                const piadasEncontradas = data.result.map(piada => piada.value);
+                dispatch({ type: ACTIONS.SET_RESULTADO_BUSCA, payload: piadasEncontradas });
+                dispatch({ type: ACTIONS.SET_ERRO, payload: '' });
+            })
+            .catch(error => {
+                console.error("Erro ao buscar por palavra-chave: ", error);
+                dispatch({ type: ACTIONS.SET_ERRO, payload: 'Erro ao buscar por palavra-chave. Por favor, tente novamente mais tarde.' });
+                dispatch({ type: ACTIONS.SET_RESULTADO_BUSCA, payload: '' });
+            });
+    };
 
     return (
         <div className="App" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
